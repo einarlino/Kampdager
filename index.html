@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matchday – kommende kamper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500&display=swap">
+<style>
+:root{--bg:#0d1224;--panel:#161d38;--line:#2a3560;--chalk:#f1f4fb;--muted:#9aa8cc;--gold:#fbe122;
+--mu:#e0372b;--ars:#4da3ff;--lfc:#2fbf71;--no:#ff4d6d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--chalk);font:400 17px/1.5 Barlow,system-ui,sans-serif}
+h1,h2{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;font-weight:800;line-height:1;margin:0}
+main{max-width:820px;margin:0 auto;padding:0 20px 56px}
+header{padding:36px 0 8px}
+h1{font-size:clamp(44px,10vw,84px)}
+header p{color:var(--muted);margin:10px 0 0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 16px}
+.filters button{font:600 17px "Barlow Condensed",sans-serif;letter-spacing:.4px;background:var(--panel);color:var(--chalk);border:2px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--chalk);color:var(--bg);border-color:var(--chalk)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.next{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.next b{display:block;font:800 34px "Barlow Condensed",sans-serif;color:var(--gold)}
+.next span{color:var(--muted)}
+ul{list-style:none;margin:0;padding:0}
+li.m{display:grid;grid-template-columns:96px 1fr;gap:4px 14px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line);border-left:5px solid var(--c)}
+li.m .w{color:var(--muted);font-size:15px;line-height:1.3}
+li.m .w b{display:block;color:var(--chalk);font-weight:500}
+li.m .t{font:800 22px "Barlow Condensed",sans-serif;line-height:1.1}
+li.m .s{color:var(--muted);font-size:15px}
+li.today{background:rgba(251,225,34,.07)}
+.note{color:var(--muted);font-size:14px;margin-top:22px}
+@media(max-width:420px){li.m{grid-template-columns:80px 1fr}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Matchday</h1>
+<p>Kommende kamper for Manchester United, Arsenal, Liverpool og Norge. Oppdatert 25. november 2026.</p>
+</header>
+<div class="filters" id="filters" role="group" aria-label="Velg lag"></div>
+<div class="next" id="next"></div>
+<ul id="list"></ul>
+<p class="note">Tidene vises i din lokale tid. Der klokkeslettet ikke er bekreftet, står bare datoen. Premier League kan flytte kamper for TV, så sjekk klubbenes egne sider før du planlegger kvelden.</p>
+</main>
+<script>
+(function(){
+var TEAMS={mu:['Man United','--mu'],ars:['Arsenal','--ars'],lfc:['Liverpool','--lfc'],no:['Norge','--no']};
+/* [UTC-tid, lag, kamp, turnering, bare dato?, egen tekst for dato] */
+var M=[
+["2026-11-25T20:00:00Z",["mu"],"Sporting CP – Manchester United","Champions League"],
+["2026-11-25T20:00:00Z",["lfc"],"Club Brugge – Liverpool","Champions League"],
+["2026-11-28T12:00:00Z",["ars"],"Arsenal – Manchester City","Premier League",1],
+["2026-11-28T15:00:00Z",["mu"],"Manchester United – Brentford","Premier League"],
+["2026-11-28T12:00:00Z",["lfc"],"Everton – Liverpool","Premier League",1],
+["2026-12-01T20:15:00Z",["ars"],"Brentford – Arsenal","Premier League"],
+["2026-12-02T20:15:00Z",["mu"],"Newcastle – Manchester United","Premier League"],
+["2026-12-02T19:30:00Z",["lfc"],"Liverpool – Sunderland","Premier League"],
+["2026-12-05T15:00:00Z",["mu"],"Manchester United – Coventry City","Premier League"],
+["2026-12-05T12:30:00Z",["lfc"],"Chelsea – Liverpool","Premier League"],
+["2026-12-06T16:30:00Z",["ars"],"Tottenham – Arsenal","Premier League"],
+["2026-12-08T20:00:00Z",["mu"],"Manchester United – RB Leipzig","Champions League"],
+["2026-12-09T20:00:00Z",["ars"],"Arsenal – Real Madrid","Champions League"],
+["2026-12-09T20:00:00Z",["lfc"],"Liverpool – FC Porto","Champions League"],
+["2026-12-12T15:00:00Z",["lfc"],"Liverpool – Leeds United","Premier League"],
+["2026-12-13T14:00:00Z",["ars"],"Arsenal – Bournemouth","Premier League"],
+["2026-12-13T19:00:00Z",["mu"],"Crystal Palace – Manchester United","Premier League"],
+["2026-12-19T17:30:00Z",["lfc"],"Liverpool – Tottenham","Premier League"],
+["2026-12-20T16:30:00Z",["ars","mu"],"Arsenal – Manchester United","Premier League"],
+["2026-12-26T12:00:00Z",["ars"],"Crystal Palace – Arsenal","Premier League",1],
+["2026-12-26T17:30:00Z",["lfc"],"Hull City – Liverpool","Premier League"],
+["2026-12-27T16:30:00Z",["mu"],"Manchester United – Nottingham Forest","Premier League"],
+["2026-12-30T19:30:00Z",["mu"],"Manchester United – Sunderland","Premier League"],
+["2026-12-30T20:15:00Z",["lfc"],"Aston Villa – Liverpool","Premier League"],
+["2027-03-26T12:00:00Z",["no"],"Norge – England","Nations League, kvartfinale 1. kamp (Oslo)",1,"25.–27. mars 2027"],
+["2027-03-29T12:00:00Z",["no"],"England – Norge","Nations League, kvartfinale 2. kamp",1,"28.–30. mars 2027"]
+];
+M.sort(function(a,b){return new Date(a[0])-new Date(b[0])});
+var sel='all',F=document.getElementById('filters');
+function btn(k,l){var b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed',k===sel);b.onclick=function(){sel=k;render()};b.dataset.k=k;F.appendChild(b)}
+btn('all','Alle');for(var k in TEAMS)btn(k,TEAMS[k][0]);
+function when(m){
+if(m[5])return '<b>'+m[5]+'</b>';
+var d=new Date(m[0]);
+var day=d.toLocaleDateString('nb-NO',{weekday:'short',day:'numeric',month:'short'});
+return '<b>'+day+'</b>'+(m[4]?'tid ikke bekreftet':d.toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}))}
+function render(){
+Array.prototype.forEach.call(F.children,function(b){b.setAttribute('aria-pressed',b.dataset.k===sel)});
+var now=Date.now(),h='',nx=null,live=false;
+var rows=M.filter(function(m){
+if(sel!=='all'&&m[1].indexOf(sel)<0)return false;
+var t=new Date(m[0]).getTime();
+return m[4]?t>now-432e5:t>now-63e5});
+rows.forEach(function(m){
+var t=new Date(m[0]).getTime();
+if(!m[4]&&t<=now){live=true;if(!nx)nx=m}else if(!nx)nx=m;
+var c=m[1].length>1?'--ars':TEAMS[m[1][0]][1];
+var isToday=new Date(m[0]).toDateString()===new Date().toDateString();
+h+='<li class="m'+(isToday?' today':'')+'" style="--c:var('+c+')"><div class="w">'+when(m)+'</div><div><div class="t">'+m[2]+'</div><div class="s">'+m[3]+(sel==='all'?' · '+m[1].map(function(x){return TEAMS[x][0]}).join(' og '):'')+'</div></div></li>'});
+document.getElementById('list').innerHTML=h||'<li class="s">Ingen kamper i listen.</li>';
+var N=document.getElementById('next');
+if(!nx){N.textContent='Ingen flere kamper i listen. Sjekk klubbenes sider.';return}
+var ms=new Date(nx[0]).getTime()-now;
+if(nx[4]){N.innerHTML='<span>Neste kamp</span><b>'+nx[2]+'</b>'+(nx[5]||new Date(nx[0]).toLocaleDateString('nb-NO',{weekday:'long',day:'numeric',month:'long'}))}
+else if(ms<=0){N.innerHTML='<span>Pågår nå</span><b>'+nx[2]+'</b>'}
+else{var d=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mi=Math.floor(ms%36e5/6e4);
+N.innerHTML='<span>Neste kamp om</span><b>'+(d?d+' d ':'')+hh+' t '+mi+' min</b>'+nx[2]}}
+render();setInterval(render,30000);
+})();
+</script>
+</body>
+</html>
