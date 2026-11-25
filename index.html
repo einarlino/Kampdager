@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500&display=swap">
 <style>
 :root{--bg:#0d1224;--panel:#161d38;--line:#2a3560;--chalk:#f1f4fb;--muted:#9aa8cc;--gold:#fbe122;
---mu:#e0372b;--ars:#4da3ff;--lfc:#2fbf71;--no:#ff4d6d;
+--mu:#e0372b;--ars:#4da3ff;--lfc:#2fbf71;--no:#ff4d6d;--lsk:#ffb703;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
@@ -39,7 +39,7 @@ li.today{background:rgba(251,225,34,.07)}
 <main>
 <header>
 <h1>Matchday</h1>
-<p>Kommende kamper for Manchester United, Arsenal, Liverpool og Norge. Oppdatert 25. november 2026.</p>
+<p>Kommende kamper for Manchester United, Arsenal, Liverpool, Lillestrøm og Norge. Oppdatert 25. november 2026.</p>
 </header>
 <div class="filters" id="filters" role="group" aria-label="Velg lag"></div>
 <div class="next" id="next"></div>
@@ -48,7 +48,7 @@ li.today{background:rgba(251,225,34,.07)}
 </main>
 <script>
 (function(){
-var TEAMS={mu:['Man United','--mu'],ars:['Arsenal','--ars'],lfc:['Liverpool','--lfc'],no:['Norge','--no']};
+var TEAMS={mu:['Man United','--mu'],ars:['Arsenal','--ars'],lfc:['Liverpool','--lfc'],no:['Norge','--no'],lsk:['Lillestrøm','--lsk']};
 /* [UTC-tid, lag, kamp, turnering, bare dato?, egen tekst for dato] */
 var M=[
 ["2026-11-25T20:00:00Z",["mu"],"Sporting CP – Manchester United","Champions League"],
@@ -75,6 +75,10 @@ var M=[
 ["2026-12-27T16:30:00Z",["mu"],"Manchester United – Nottingham Forest","Premier League"],
 ["2026-12-30T19:30:00Z",["mu"],"Manchester United – Sunderland","Premier League"],
 ["2026-12-30T20:15:00Z",["lfc"],"Aston Villa – Liverpool","Premier League"],
+["2026-11-26T12:00:00Z",["lsk"],"Lyon – Lillestrøm","Europa League",1],
+["2026-11-30T18:00:00Z",["lsk"],"Lillestrøm – HamKam","Eliteserien"],
+["2026-12-06T16:00:00Z",["lsk"],"Kristiansund – Lillestrøm","Eliteserien"],
+["2026-12-13T16:00:00Z",["lsk"],"Lillestrøm – Tromsø","Eliteserien"],
 ["2027-03-26T12:00:00Z",["no"],"Norge – England","Nations League, kvartfinale 1. kamp (Oslo)",1,"25.–27. mars 2027"],
 ["2027-03-29T12:00:00Z",["no"],"England – Norge","Nations League, kvartfinale 2. kamp",1,"28.–30. mars 2027"]
 ];
